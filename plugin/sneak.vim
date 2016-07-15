@@ -157,11 +157,11 @@ func! sneak#to(op, input, inputlen, count, repeatmotion, reverse, inclusive, str
     endif
   endfor
 
-  if nudge && (!is_v || max(matchpos) > 0)
-    call sneak#util#nudge(a:reverse) "undo nudge for t
-  endif
-
   if 0 == max(matchpos)
+    if nudge
+      call sneak#util#nudge(a:reverse) "undo nudge for t
+    endif
+
     let km = empty(&keymap) ? '' : ' ('.&keymap.' keymap)'
     call sneak#util#echo('not found'.(max(bounds) ? printf(km.' (in columns %d-%d): %s', bounds[0], bounds[1], a:input) : km.': '.a:input))
     return
@@ -208,6 +208,10 @@ func! sneak#to(op, input, inputlen, count, repeatmotion, reverse, inclusive, str
     " VIM doesn't apply the operator on the current character when forward
     " searching, therefore move the cursor 1 to right in f- and t-like mode.
     call sneak#util#nudge(1)
+  endif
+
+  if nudge
+    call sneak#util#nudge(a:reverse) "undo nudge for t
   endif
 
   if is_op || "" != target
